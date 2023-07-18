@@ -1,0 +1,26 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "type": "array",
+  "items": [
+    {
+      "type": "object",
+      "properties": {
+        "shopId": {
+          "type": "integer"
+        },
+        "shopName": {
+          "type": "string"
+        },
+        "shopPublic": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "shopId",
+        "shopName",
+        "shopPublic"
+      ]
+    }
+  ]
+}
+
