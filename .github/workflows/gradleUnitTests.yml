@@ -11,8 +11,8 @@ on:
   push:
     branches: [ "master" ]
     paths-ignore: 
-      -'\src\test\java\com\example\shop\ShopApplicationApiTest.java'
-      -'\src\test\java\com\example\shop\ShopApplicationUiTest.java' 
+      -'/home/runner/work/shop/shop/src/test/java/com/example/shop/ShopApplicationApiTest.java'
+      -'/home/runner/work/shop/shop/src/test/java/com/example/shop/ShopApplicationUiTest.java' 
 
 permissions:
   contents: read
