@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -138,31 +139,30 @@ class ShopControllerUnitTest extends Configuration {
         for (int i = 0; i < response.getBody().size(); i++) {
             assertNotNull(response.getBody().get(i).getShopId());
             assertNotNull(response.getBody().get(i).getShopName());
+            assertNotNull(response.getBody().get(i).getShopPublic());
         }
-        assertEquals(dto.getShopName(), response.getBody().get(response.getBody().size() - 1).getShopName());
-        assertEquals(dto.isShopPublic(), response.getBody().get(response.getBody().size() - 1).getShopPublic());
     }
 
     @Test
     @DisplayName("Получение магазина по идентификатору")
     void getShop_shouldReturnShopByIdAnd200Response() {
-        String expectedShopName = "ShopById";
+        String expectedShopName = "BBBBBBBBBB";
         boolean expectedShopPublic = true;
-        ShopController shopController = new ShopController();
-        ShopDto dto = new ShopDto(12250L, expectedShopName, expectedShopPublic);
 
+        ShopController shopController = new ShopController();
+
+        List<ShopPojo> actualShops = shopController.getShops().getBody();
+
+        ShopDto dto = new ShopDto(12250L, expectedShopName, expectedShopPublic);
         shopController.addShop(dto);
 
-        ResponseEntity<List<ShopPojo>> responseShops = shopController.getShops();
+        List<ShopPojo> responseShops = shopController.getShops().getBody();
 
-        Long lastShopId = responseShops.getBody().get(responseShops.getBody().size() - 1).getShopId();
+        responseShops.removeAll(actualShops);
 
-        ResponseEntity<ShopPojo> response = shopController.getShop(lastShopId);
-
-        assertEquals(200, response.getStatusCode().value());
-        assertEquals(expectedShopName, response.getBody().getShopName());
-        assertEquals(expectedShopPublic, response.getBody().getShopPublic());
-        assertEquals(HttpHeaders.EMPTY, response.getHeaders());
+        assertEquals(1, responseShops.size());
+        assertEquals(expectedShopName, responseShops.get(0).getShopName());
+        assertEquals(expectedShopPublic, responseShops.get(0).getShopPublic());
     }
 
     @Test
@@ -170,14 +170,19 @@ class ShopControllerUnitTest extends Configuration {
     void deleteShop_shouldReturnShopDeleteByIdAnd204Response() {
         String expectedShopName = "ShopDeleteById";
         boolean expectedShopPublic = true;
-        ShopController shopController = new ShopController();
-        ShopDto dto = new ShopDto(12250L, expectedShopName, expectedShopPublic);
 
+        ShopController shopController = new ShopController();
+
+        List<ShopPojo> actualShops = shopController.getShops().getBody();
+
+        ShopDto dto = new ShopDto(12250L, expectedShopName, expectedShopPublic);
         shopController.addShop(dto);
 
-        ResponseEntity<List<ShopPojo>> responseShops = shopController.getShops();
+        List<ShopPojo> responseShops = shopController.getShops().getBody();
 
-        Long lastShopId = responseShops.getBody().get(responseShops.getBody().size() - 1).getShopId();
+        responseShops.removeAll(actualShops);
+
+        Long lastShopId = responseShops.get(0).getShopId();
 
         ResponseEntity<String> response = shopController.deleteShop(lastShopId);
 

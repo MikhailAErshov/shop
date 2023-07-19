@@ -4,6 +4,7 @@ import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,15 +49,27 @@ public class MainPageUiData {
         });
 
         List<String> errorList = new ArrayList<>();
-        errorValidationName.forEach(error -> errorList.add(error.getText()));
+        errorValidationName.forEach(product -> {
+            String[] strings = product.getText().split("\\n");
+            for (String s : strings
+            ) {
+                errorList.add(s);
+            }
+        });
 
         step("Проверить валидацию полей", () -> {
-            assertTrue(errorList.contains("Name should begin with a capital letter."));
-            assertTrue(errorList.contains("Name length should be more than 6 characters."));
+            assertEquals("Name should begin with a capital letter.", errorList.get(0));
+            assertEquals("Name length should be more than 6 characters.", errorList.get(1));
         });
 
         List<String> searchShopResultBeforeCreate = new ArrayList<>();
-        responseTable.forEach(product -> searchShopResultBeforeCreate.add(product.getText()));
+        responseTable.forEach(product -> {
+            String[] strings = product.getText().split("\\n");
+            for (String s : strings
+            ) {
+                searchShopResultBeforeCreate.add(s);
+            }
+        });
         String newShopName = "MagazZZzin35";
 
         step("Заполнить поле названия магазина", () -> {
@@ -76,21 +89,32 @@ public class MainPageUiData {
         });
 
         step("Обновить список магазинов через кнопку рефреш", () -> {
-            buttonRefresh.shouldBe(Condition.visible);
-            buttonRefresh.click();
+            buttonRefresh.shouldBe(Condition.visible, Duration.ofSeconds(5));
+            buttonRefresh.hover().click();
+            assertEquals("Refresh", buttonRefresh.getText());
         });
 
+        sleep(10000);
+
         List<String> searchShopResultAfterCreate = new ArrayList<>();
-        responseTable.forEach(product -> searchShopResultAfterCreate.add(product.getText()));
+        while (searchShopResultAfterCreate.isEmpty()) {
+            responseTable.forEach(product -> {
+                String[] strings = product.getText().split("\\n");
+                for (String s : strings
+                ) {
+                    searchShopResultAfterCreate.add(s);
+                }
+            });
+        }
+
         searchShopResultAfterCreate.removeAll(searchShopResultBeforeCreate);
 
         step("Убедиться что магазин создан и есть в списке", () -> {
-            assertTrue(searchShopResultAfterCreate.contains(newShopName));
-            assertEquals("true", searchShopResultAfterCreate.get(2));
+            assertEquals(newShopName, searchShopResultAfterCreate.get(0).split(" ")[1]);
+            assertEquals("true", searchShopResultAfterCreate.get(0).split(" ")[2]);
         });
 
-        String newShopId = searchShopResultAfterCreate.get(0);
-        return newShopId;
+        return searchShopResultAfterCreate.get(0).split(" ")[0];
     }
 
     public void shouldDeleteShop(String shopId) {
@@ -106,7 +130,13 @@ public class MainPageUiData {
         });
 
         List<String> searchShopResultBeforeDelete = new ArrayList<>();
-        responseTable.forEach(product -> searchShopResultBeforeDelete.add(product.getText()));
+        responseTable.forEach(product -> {
+            String[] strings = product.getText().split("\\n");
+            for (String s : strings
+            ) {
+                searchShopResultBeforeDelete.add(s);
+            }
+        });
 
         step("Заполнить поле id магазина", () -> {
             inputDeleteId.shouldBe(Condition.visible);
@@ -118,11 +148,23 @@ public class MainPageUiData {
         });
 
         step("Обновить список магазинов", () -> {
-            buttonRefresh.click();
+            buttonRefresh.hover().click();
+            assertEquals("Refresh", buttonRefresh.getText());
         });
 
+        sleep(10000);
+
         List<String> searchShopResultAfterDelete = new ArrayList<>();
-        responseTable.forEach(product -> searchShopResultAfterDelete.add(product.getText()));
+        while (searchShopResultAfterDelete.isEmpty()) {
+            responseTable.forEach(product -> {
+                String[] strings = product.getText().split("\\n");
+                for (String s : strings
+                ) {
+                    searchShopResultAfterDelete.add(s);
+                }
+            });
+        }
+
         searchShopResultAfterDelete.removeAll(searchShopResultBeforeDelete);
 
         step("Убедиться что магазин удален и его нет в списке", () -> {

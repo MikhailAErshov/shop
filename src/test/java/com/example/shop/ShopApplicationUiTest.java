@@ -1,28 +1,27 @@
 package com.example.shop;
 
 import com.codeborne.selenide.Condition;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.boot.test.context.SpringBootTest;
 
 public class ShopApplicationUiTest extends BaseTestUi {
 
     MainPageUiData mainPageUiData = new MainPageUiData();
 
+    public static String shopId;
+
     @Test
     @Order(1)
     @DisplayName("Проверка создания магазина")
-    @Disabled
-    public void shouldCreateShop() {mainPageUiData.shouldCreateShop(); }
+    public void shouldCreateShop() {
+        shopId = mainPageUiData.shouldCreateShop();
+    }
 
     @Test
     @Order(2)
     @DisplayName("Проверка удаления магазина")
-    @Disabled
     public void shouldDeleteShop() {
-        mainPageUiData.shouldDeleteShop(mainPageUiData.shouldCreateShop());
+        mainPageUiData.shouldDeleteShop(shopId);
     }
 
     @Test
