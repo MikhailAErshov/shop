@@ -20,6 +20,21 @@ dependencies {
 	implementation 'org.postgresql:postgresql:42.6.0'
 	implementation 'org.json:json:20230227'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.1.1'
+	testImplementation 'io.rest-assured:rest-assured:5.3.0'
+	testImplementation 'io.rest-assured:json-schema-validator:5.3.0'
+	testImplementation 'org.assertj:assertj-core:3.24.2'
+	implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.14.2'
+	testImplementation 'io.rest-assured:jsom.codeborne:selenide:6.13.1')
+	testImplementation("io.n-schema-validator:5.3.1'
+	testImplementation('coqameta.allure:allure-selenide:${allureVersion}")
+	testImplementation('org.slf4j:slf4j-simple:2.0.7')
+	testImplementation("org.junit.jupiter:junit-jupiter-api:${junitVersion}")
+	testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:${junitVersion}")
+	testImplementation 'org.apache.httpcomponents.client5:httpclient5:5.2.1'
+//	implementation 'org.springframework.security:spring-security-core:6.1.1'
+//	implementation 'org.springframework.security:spring-security-web:6.1.1'
+//	implementation 'org.springframework.security:spring-security-config:6.1.1'
+	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf:3.1.1'
 }
 
 tasks.named('test') {
