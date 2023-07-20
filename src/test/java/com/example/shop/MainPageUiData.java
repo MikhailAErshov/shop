@@ -1,5 +1,6 @@
 package com.example.shop;
 
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
@@ -25,7 +26,7 @@ public class MainPageUiData {
     public SelenideElement buttonCreateShop = $x("//div[@id='create']/div/button");
     public SelenideElement inputDeleteId = $x("//input[@id='id']");
     public SelenideElement buttonDeleteShop = $x("//div[@id='delete']/div/button");
-    public ElementsCollection errorValidationName = $$x("//*[@id='name_validation']/ul");
+    public ElementsCollection errorValidationName = $$x("//*[@id='name_validation']/ul/li");
     public SelenideElement errorValidationDelete = $x("//*[@id='id_validation']/p");
     public SelenideElement footerLinkTelegram = $x("//footer/div/a[1]");
     public SelenideElement footerLinkVk = $x("//footer/div/a[2]");
@@ -48,18 +49,10 @@ public class MainPageUiData {
             buttonCreateShop.click();
         });
 
-        List<String> errorList = new ArrayList<>();
-        errorValidationName.forEach(product -> {
-            String[] strings = product.getText().split("\\n");
-            for (String s : strings
-            ) {
-                errorList.add(s);
-            }
-        });
-
         step("Проверить валидацию полей", () -> {
-            assertEquals("Name should begin with a capital letter.", errorList.get(0));
-            assertEquals("Name length should be more than 6 characters.", errorList.get(1));
+            errorValidationName.should(CollectionCondition
+                    .exactTextsCaseSensitiveInAnyOrder("Name should begin with a capital letter.",
+                            "Name length should be more than 6 characters."));
         });
 
         List<String> searchShopResultBeforeCreate = new ArrayList<>();
@@ -70,6 +63,7 @@ public class MainPageUiData {
                 searchShopResultBeforeCreate.add(s);
             }
         });
+
         String newShopName = "MagazZZzin35";
 
         step("Заполнить поле названия магазина", () -> {
