@@ -9,7 +9,6 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "master" ]
     paths-ignore: 
       -'/home/runner/work/shop/shop/src/test/java/com/example/shop/ShopApplicationApiTest.java'
       -'/home/runner/work/shop/shop/src/test/java/com/example/shop/ShopApplicationUiTest.java' 
