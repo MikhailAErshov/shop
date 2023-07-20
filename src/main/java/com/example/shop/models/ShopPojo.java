@@ -8,6 +8,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+import java.util.Objects;
+
 @Entity
 @Table(name = "shops", uniqueConstraints = {@UniqueConstraint(columnNames = "shop_id")})
 public class ShopPojo {
@@ -45,5 +47,18 @@ public class ShopPojo {
     @Column(name = "shop_public",  nullable = false)
     public boolean getShopPublic() {
         return shopPublic;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ShopPojo shopPojo = (ShopPojo) o;
+        return shopPublic == shopPojo.shopPublic && Objects.equals(shopId, shopPojo.shopId) && Objects.equals(shopName, shopPojo.shopName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(shopId, shopName, shopPublic);
     }
 }
