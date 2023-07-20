@@ -1,12 +1,16 @@
 package com.example.shop;
 
+import com.codeborne.selenide.CollectionCondition;
 import com.codeborne.selenide.Condition;
 import com.codeborne.selenide.ElementsCollection;
 import com.codeborne.selenide.SelenideElement;
 
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.codeborne.selenide.Condition.attribute;
 import static com.codeborne.selenide.Selenide.*;
@@ -14,21 +18,37 @@ import static io.qameta.allure.Allure.step;
 import static org.junit.jupiter.api.Assertions.*;
 
 public class MainPageUiData {
-    public SelenideElement title = $x("/html/head/title");
-    public SelenideElement linkCreateShop = $x("//div[@id='links']/a[contains(text(),'Create shop')]");
-    public SelenideElement linkAllShop = $x("//div[@id='links']/a[contains(text(),'All shops')]");
-    public SelenideElement linkDeleteShop = $x("//div[@id='links']/a[contains(text(),'Delete shop')]");
-    public SelenideElement buttonRefresh = $x("//div[@id='shops_div']/button");
-    public ElementsCollection responseTable = $$x("//tbody[@id='response']");
-    public SelenideElement inputShopName = $x("//input[@id='name']");
-    public SelenideElement inputCheckboxPublic = $x("//input[@id='public']");
-    public SelenideElement buttonCreateShop = $x("//div[@id='create']/div/button");
-    public SelenideElement inputDeleteId = $x("//input[@id='id']");
-    public SelenideElement buttonDeleteShop = $x("//div[@id='delete']/div/button");
-    public ElementsCollection errorValidationName = $$x("//*[@id='name_validation']/ul");
-    public SelenideElement errorValidationDelete = $x("//*[@id='id_validation']/p");
-    public SelenideElement footerLinkTelegram = $x("//footer/div/a[1]");
-    public SelenideElement footerLinkVk = $x("//footer/div/a[2]");
+    private SelenideElement title = $x("/html/head/title");
+    private SelenideElement linkCreateShop = $x("//div[@id='links']/a[contains(text(),'Create shop')]");
+    private SelenideElement linkAllShop = $x("//div[@id='links']/a[contains(text(),'All shops')]");
+    private SelenideElement linkDeleteShop = $x("//div[@id='links']/a[contains(text(),'Delete shop')]");
+    private SelenideElement buttonRefresh = $x("//div[@id='shops_div']/button");
+    private ElementsCollection responseTable = $$x("//tbody[@id='response']");
+    private ElementsCollection shopsId = $$x("//tbody[@id='response']//td[1]");
+    private ElementsCollection responseTableId = $$x("//*[@id='response']/tr/td[1]");
+    private ElementsCollection responseTableName = $$x("//*[@id='response']/tr/td[2]");
+    private ElementsCollection responseTablePublic = $$x("//*[@id='response']/tr/td[3]");
+    private SelenideElement inputShopName = $x("//input[@id='name']");
+    private SelenideElement inputCheckboxPublic = $x("//input[@id='public']");
+    private SelenideElement buttonCreateShop = $x("//div[@id='create']/div/button");
+    private SelenideElement inputDeleteId = $x("//input[@id='id']");
+    private SelenideElement buttonDeleteShop = $x("//div[@id='delete']/div/button");
+    private ElementsCollection errorValidationName = $$x("//*[@id='name_validation']/ul/li");
+    private SelenideElement errorValidationDelete = $x("//*[@id='id_validation']/p");
+    private SelenideElement footerLinkTelegram = $x("//footer/div/a[1]");
+    private SelenideElement footerLinkVk = $x("//footer/div/a[2]");
+
+    private List<String> getTextFromElements(ElementsCollection elements){
+        List<String> textElements = new ArrayList<>();
+        elements.asDynamicIterable().forEach(product -> {
+            String[] strings = product.getText().split("\\n");
+            for (String s : strings
+            ) {
+                textElements.add(s);
+            }
+        });
+        return textElements;
+    }
 
     public String shouldCreateShop() {
 
@@ -48,28 +68,32 @@ public class MainPageUiData {
             buttonCreateShop.click();
         });
 
-        List<String> errorList = new ArrayList<>();
-        errorValidationName.forEach(product -> {
-            String[] strings = product.getText().split("\\n");
-            for (String s : strings
-            ) {
-                errorList.add(s);
-            }
-        });
+//        List<String> errorList = getTextFromElements(errorValidationName);
 
         step("Проверить валидацию полей", () -> {
-            assertEquals("Name should begin with a capital letter.", errorList.get(0));
-            assertEquals("Name length should be more than 6 characters.", errorList.get(1));
+            errorValidationName.should(CollectionCondition
+                    .exactTextsCaseSensitiveInAnyOrder("Name should begin with a capital letter.",
+                            "Name length should be more than 6 characters."));
         });
 
-        List<String> searchShopResultBeforeCreate = new ArrayList<>();
-        responseTable.forEach(product -> {
-            String[] strings = product.getText().split("\\n");
-            for (String s : strings
-            ) {
-                searchShopResultBeforeCreate.add(s);
+//        List<String> searchShopResultBeforeCreate = shopsId.texts();
+
+        List<ShopModelUI> shopsBefore = new ArrayList<>();
+        for (int i = 0; i < responseTableId.size(); i++) {
+            for (int i1 = 0; i1 < responseTableName.size(); i1++) {
+                for (int i2 = 0; i2 < responseTablePublic.size(); i2++) {
+                    shopsBefore.add(new ShopModelUI(responseTableId.get(i).getText(), responseTableName.get(i1).getText(),
+                            responseTablePublic.get(i2).getText()));
+                }
             }
-        });
+        }
+
+//        List<ShopModelUI> shopsBefore2 = responseTableId.stream()
+//                .flatMap(id -> responseTableName.stream()
+//                .flatMap(name -> responseTablePublic.stream()
+//                .map(isPublic -> new ShopModelUI(id.getText(), name.getText(), isPublic.getText()))))
+//                .toList();
+
         String newShopName = "MagazZZzin35";
 
         step("Заполнить поле названия магазина", () -> {
@@ -96,25 +120,34 @@ public class MainPageUiData {
 
         sleep(10000);
 
-        List<String> searchShopResultAfterCreate = new ArrayList<>();
-        while (searchShopResultAfterCreate.isEmpty()) {
-            responseTable.forEach(product -> {
-                String[] strings = product.getText().split("\\n");
-                for (String s : strings
-                ) {
-                    searchShopResultAfterCreate.add(s);
+//        List<String> searchShopResultAfterCreate = shopsId.texts();
+
+        List<ShopModelUI> shopsAfter = new ArrayList<>();
+        for (int i = 0; i < responseTableId.size(); i++) {
+            for (int i1 = 0; i1 < responseTableName.size(); i1++) {
+                for (int i2 = 0; i2 < responseTablePublic.size(); i2++) {
+                    shopsAfter.add(new ShopModelUI(responseTableId.get(i).getText(), responseTableName.get(i1).getText(),
+                            responseTablePublic.get(i2).getText()));
                 }
-            });
+            }
         }
 
-        searchShopResultAfterCreate.removeAll(searchShopResultBeforeCreate);
+//        List<ShopModelUI> shopsAfter2 = responseTableId.stream()
+//                .flatMap(id -> responseTableName.stream()
+//                        .flatMap(name -> responseTablePublic.stream()
+//                                .map(isPublic -> new ShopModelUI(id.getText(), name.getText(), isPublic.getText()))))
+//                .toList();
+
+//        searchShopResultAfterCreate.removeAll(searchShopResultBeforeCreate);
+
+        shopsAfter.removeAll(shopsBefore);
 
         step("Убедиться что магазин создан и есть в списке", () -> {
-            assertEquals(newShopName, searchShopResultAfterCreate.get(0).split(" ")[1]);
-            assertEquals("true", searchShopResultAfterCreate.get(0).split(" ")[2]);
+            assertEquals(newShopName, shopsAfter.get(0).getShopName());
+            assertEquals("true", shopsAfter.get(0).getIsPublic());
         });
 
-        return searchShopResultAfterCreate.get(0).split(" ")[0];
+        return shopsAfter.get(0).getId();
     }
 
     public void shouldDeleteShop(String shopId) {

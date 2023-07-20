@@ -27,8 +27,7 @@ public class BaseTestUi {
     @BeforeEach
     public void setUp() {
         Configuration.browserCapabilities = new ChromeOptions().addArguments("--remote-allow-origins=*");
-        open("http://localhost:63342/shop/src/main/java/com/example/shop/ui/main.html?_ijt=mlaf7bal1kfh6qcpplbnu2hg2r&_ij_reload=RELOAD_ON_SAVE");
-        Selenide.webdriver().driver().getWebDriver().manage().addCookie(new Cookie("Idea-31a6112c", "55212b94-e383-41d7-aaee-e01e8d935910"));
+        open("http://localhost:63342/shop/src/main/java/com/example/shop/ui/main.html?_ijt=mg35s6ftiv1ospj3tkqcl8kscs&_ij_reload=RELOAD_ON_SAVE");
         Selenide.webdriver().driver().getWebDriver().manage().addCookie(new Cookie("Idea-31a6112c", "55212b94-e383-41d7-aaee-e01e8d935910"));
         refresh();
     }
